@@ -7,6 +7,7 @@ import { generateExam, sanitizeExam } from '../exam/generator.js';
 import { gradeQuestion } from '../exam/grading.js';
 import { BLUEPRINT } from '../exam/blueprint.js';
 import { activeProvider, mapLimit } from '../ai/grader.js';
+import { buildLearningExportJson, buildLearningExportMarkdown, type ExportAttempt } from '../exam/export.js';
 import { ihkGrade, type Answer, type AttemptSummary, type AttemptView, type Exam, type GradeResult, type Question } from '../../../shared/types.js';
 
 export const attemptsRouter = Router();
@@ -85,6 +86,41 @@ attemptsRouter.post('/', (req: AuthedRequest, res) => {
      VALUES (?, ?, ?, ?, NULL, 'running', ?, '{}', NULL, NULL, ?)`,
   ).run(id, req.user!.id, now.toISOString(), deadline.toISOString(), JSON.stringify(exam), exam.totalPoints);
   res.status(201).json(toView(loadOwn(req, id)!));
+});
+
+function toExportAttempt(r: AttemptRow): ExportAttempt {
+  return {
+    id: r.id,
+    startedAt: r.started_at,
+    submittedAt: r.submitted_at,
+    exam: JSON.parse(r.exam_json) as Exam,
+    answers: JSON.parse(r.answers_json) as Record<string, Answer>,
+    results: JSON.parse(r.results_json ?? '{}') as Record<string, GradeResult>,
+    score: r.score ?? 0,
+  };
+}
+
+/**
+ * Export einer ausgewerteten Prüfung für KI-Modelle (Lernplan-Erstellung).
+ * ?format=md (Standard) liefert Markdown mit Anweisung an die KI, ?format=json die Rohdaten.
+ * ?download=1 setzt Content-Disposition: attachment.
+ */
+attemptsRouter.get('/:id/export', (req: AuthedRequest, res) => {
+  const row = loadOwn(req, req.params.id as string);
+  if (!row) return res.status(404).json({ error: 'Nicht gefunden' });
+  if (row.status !== 'graded' || !row.results_json) return res.status(409).json({ error: 'Die Prüfung ist noch nicht ausgewertet' });
+  const history = (
+    db
+      .prepare("SELECT * FROM attempts WHERE user_id = ? AND status = 'graded' AND id != ? AND started_at < ? ORDER BY started_at DESC LIMIT 10")
+      .all(req.user!.id, row.id, row.started_at) as unknown as AttemptRow[]
+  ).map(toExportAttempt);
+  const input = { attempt: toExportAttempt(row), history, userName: req.user!.name, blueprintVersion: BLUEPRINT.version };
+  const format = req.query.format === 'json' ? 'json' : 'md';
+  const stamp = row.started_at.slice(0, 10);
+  const filename = `ap1-auswertung-${stamp}-${row.id.slice(0, 8)}.${format}`;
+  if (req.query.download) res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  if (format === 'json') return res.json(buildLearningExportJson(input));
+  res.type('text/markdown; charset=utf-8').send(buildLearningExportMarkdown(input));
 });
 
 attemptsRouter.get('/:id', (req: AuthedRequest, res) => {

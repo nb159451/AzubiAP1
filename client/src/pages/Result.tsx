@@ -4,6 +4,53 @@ import { api } from '../api';
 import { ihkGrade, type AttemptView } from '../../../shared/types';
 import { QuestionView, scoreClass } from '../components/QuestionView';
 
+/** Export der Auswertung als Vorlage für einen KI-Lernplan (Markdown / JSON, Download oder Zwischenablage). */
+function LearningPlanExport({ attemptId }: { attemptId: string }) {
+  const [copied, setCopied] = useState<'idle' | 'busy' | 'ok' | 'error'>('idle');
+  const [copyError, setCopyError] = useState('');
+
+  async function copy() {
+    setCopied('busy');
+    setCopyError('');
+    try {
+      const md = await api.exportMarkdown(attemptId);
+      await navigator.clipboard.writeText(md);
+      setCopied('ok');
+      window.setTimeout(() => setCopied('idle'), 3000);
+    } catch (e) {
+      setCopied('error');
+      setCopyError((e as Error).message || 'Kopieren nicht möglich – bitte die Datei herunterladen.');
+    }
+  }
+
+  return (
+    <div className="card export-box">
+      <div className="row spread" style={{ alignItems: 'flex-start' }}>
+        <div>
+          <h2 style={{ marginTop: 0 }}>Lernplan mit KI erstellen</h2>
+          <p className="muted small" style={{ margin: '0.2rem 0 0' }}>
+            Exportiert diese Auswertung in einem für KI-Modelle aufbereiteten Format: Anweisung an die KI, Ergebnis je Handlungsschritt und Thema,
+            jede Aufgabe mit Ihrer Antwort, Musterlösung und Prüferfeedback sowie der Verlauf früherer Versuche. Fügen Sie den Export einfach in
+            ChatGPT, Claude oder Gemini ein – die Anweisung für den Lernplan ist bereits enthalten.
+          </p>
+        </div>
+      </div>
+      <div className="row" style={{ marginTop: '0.8rem', flexWrap: 'wrap' }}>
+        <button className="btn btn-primary" onClick={copy} disabled={copied === 'busy'}>
+          {copied === 'busy' ? <><span className="spinner" /> Wird kopiert …</> : copied === 'ok' ? '✓ In Zwischenablage kopiert' : 'Für KI in Zwischenablage kopieren'}
+        </button>
+        <a className="btn" href={api.exportUrl(attemptId, 'md', true)} download>
+          Markdown herunterladen (.md)
+        </a>
+        <a className="btn" href={api.exportUrl(attemptId, 'json', true)} download>
+          Rohdaten (JSON)
+        </a>
+      </div>
+      {copied === 'error' && <div className="error" style={{ marginTop: '0.6rem' }}>{copyError}</div>}
+    </div>
+  );
+}
+
 export function ResultPage() {
   const { id } = useParams<{ id: string }>();
   const [attempt, setAttempt] = useState<AttemptView | null>(null);
@@ -137,6 +184,8 @@ export function ResultPage() {
         </table>
         </div>
       </div>
+
+      <LearningPlanExport attemptId={attempt.id} />
 
       {attempt.exam.sections.map((s, si) => (
         <div key={s.section}>

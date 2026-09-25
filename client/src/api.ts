@@ -46,6 +46,19 @@ export const api = {
   selfGrade: (id: string, questionId: string, points: number) =>
     request<AttemptView>('POST', `/api/attempts/${id}/self-grade`, { questionId, points }),
   regrade: (id: string, questionId: string) => request<AttemptView>('POST', `/api/attempts/${id}/regrade`, { questionId }),
+
+  /** URL des KI-Exports (Markdown oder JSON), optional als Download. */
+  exportUrl: (id: string, format: 'md' | 'json', download = false) =>
+    `/api/attempts/${id}/export?format=${format}${download ? '&download=1' : ''}`,
+  /** Markdown-Export als Text (z. B. für die Zwischenablage). */
+  exportMarkdown: async (id: string) => {
+    const res = await fetch(`/api/attempts/${id}/export?format=md`, { credentials: 'same-origin' });
+    if (!res.ok) {
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      throw new ApiError(res.status, data.error ?? `Fehler ${res.status}`, data);
+    }
+    return res.text();
+  },
 };
 
 export interface BlueprintInfo {

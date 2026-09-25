@@ -24,6 +24,12 @@ Quellen, Themenkreise und Abweichungen vom Originalformat: `docs/pruefungskatalo
   - Netzpläne (Vorgangsknoten: FAZ/FEZ/SAZ/SEZ/GP/FP, kritischer Pfad)
 - 90-Minuten-Timer mit automatischer Abgabe, Autosave der Antworten
 - Auswertung mit IHK-Notenschlüssel, Musterlösungen, KI-Feedback je Kriterium, Selbstbewertung als Fallback
+- **Export für KI-Lernpläne** (`server/src/exam/export.ts`): jede ausgewertete Prüfung lässt sich als Markdown
+  (Zwischenablage oder `.md`) oder JSON exportieren. Das Markdown ist für Sprachmodelle aufgebaut: Anweisung an
+  die KI (Diagnose, Priorisierung, Wochenplan, Erfolgskontrolle), Prüfungskontext und Notenschlüssel, Ergebnis je
+  Handlungsschritt und Thema mit Priorität, jede nicht vollständig gelöste Aufgabe mit Aufgabentext, wörtlicher
+  Antwort, Musterlösung, verlorenen Teilpunkten und Prüferfeedback, Verlauf früherer Versuche mit wiederkehrenden
+  Schwächen sowie ein maschinenlesbarer JSON-Block. Endpunkt: `GET /api/attempts/:id/export?format=md|json[&download=1]`
 
 ## Voraussetzungen
 

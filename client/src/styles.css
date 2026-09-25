@@ -1033,3 +1033,11 @@ kbd {
   border: 1px solid var(--border);
   font-size: 0.85em;
 }
+
+/* Export für KI-Lernplan */
+.export-box {
+  border-left: 4px solid var(--primary);
+}
+.export-box .row a.btn {
+  text-decoration: none;
+}
