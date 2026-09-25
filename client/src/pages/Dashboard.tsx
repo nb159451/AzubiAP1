@@ -98,6 +98,7 @@ export function DashboardPage() {
         {!attempts && <div className="muted">Lade …</div>}
         {attempts && attempts.length === 0 && <div className="muted">Noch keine Prüfung absolviert.</div>}
         {attempts && attempts.length > 0 && (
+          <div className="tbl-wrap">
           <table className="tbl">
             <thead>
               <tr>
@@ -133,6 +134,7 @@ export function DashboardPage() {
               })}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

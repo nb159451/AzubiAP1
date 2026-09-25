@@ -129,26 +129,34 @@ export function ExamPage() {
 
   return (
     <div className="exam-layout">
-      <aside className="exam-side">
-        <div className="card">
-          <div className="small muted">Verbleibende Zeit</div>
+      <aside className="exam-rail">
+        <div className="rail-status">
+          <div className="small muted rail-label">Verbleibende Zeit</div>
           <div className={`timer ${remaining < 5 * 60 * 1000 ? 'warn' : ''}`}>{fmt(remaining)}</div>
-          <div className="progress" style={{ margin: '0.6rem 0' }}>
+          <div className="progress">
             <div style={{ width: `${(100 * answered) / flat.length}%` }} />
           </div>
           <div className="small muted">
-            {answered} von {flat.length} Aufgaben beantwortet · {attempt.exam.totalPoints} Punkte
+            {answered} von {flat.length} beantwortet
           </div>
+        </div>
+        <nav className="rail-nav" aria-label="Aufgaben">
           {attempt.exam.sections.map((s, si) => (
             <div key={s.section} className="nav-section">
               <div className="t">
-                HS {si + 1}: {s.title}
+                HS {si + 1}<span className="t-title">: {s.title}</span>
               </div>
               <div className="nav-q">
                 {s.questions.map((q, qi) => {
                   const idx = flat.findIndex((f) => f.q.id === q.id);
                   return (
-                    <button key={q.id} className={`${hasAnswer(answers[q.id]) ? 'answered' : ''} ${idx === pos ? 'active' : ''}`} onClick={() => setPos(idx)} title={q.title}>
+                    <button
+                      key={q.id}
+                      className={`${hasAnswer(answers[q.id]) ? 'answered' : ''} ${idx === pos ? 'active' : ''}`}
+                      onClick={() => setPos(idx)}
+                      title={q.title}
+                      aria-current={idx === pos ? 'true' : undefined}
+                    >
                       {si + 1}.{qi + 1}
                     </button>
                   );
@@ -156,21 +164,21 @@ export function ExamPage() {
               </div>
             </div>
           ))}
-          <div style={{ marginTop: '1rem' }}>
-            <button className="btn btn-danger" style={{ width: '100%', justifyContent: 'center' }} disabled={submitting} onClick={() => void submit(false)}>
-              {submitting ? 'Wird abgegeben …' : 'Prüfung abgeben'}
-            </button>
-            <div className="savestate" style={{ marginTop: '0.4rem', textAlign: 'center' }}>
-              {saveState === 'saving' && 'Speichere …'}
-              {saveState === 'saved' && 'Alle Antworten gespeichert'}
-              {saveState === 'dirty' && 'Ungespeicherte Änderungen'}
-              {saveState === 'error' && <span style={{ color: 'var(--danger)' }}>Speichern fehlgeschlagen – wird erneut versucht</span>}
-              {saveState === 'idle' && 'Antworten werden automatisch gespeichert'}
-            </div>
+        </nav>
+        <div className="rail-submit">
+          <button className="btn btn-danger" disabled={submitting} onClick={() => void submit(false)}>
+            {submitting ? 'Wird abgegeben …' : 'Prüfung abgeben'}
+          </button>
+          <div className="savestate">
+            {saveState === 'saving' && 'Speichere …'}
+            {saveState === 'saved' && 'Alle Antworten gespeichert'}
+            {saveState === 'dirty' && 'Ungespeicherte Änderungen'}
+            {saveState === 'error' && <span style={{ color: 'var(--danger)' }}>Speichern fehlgeschlagen – wird erneut versucht</span>}
+            {saveState === 'idle' && 'Antworten werden automatisch gespeichert'}
           </div>
         </div>
       </aside>
-      <section>
+      <section className="exam-content">
         <div className="small muted" style={{ marginBottom: '0.4rem' }}>
           Handlungsschritt {cur.si + 1}: {cur.sectionTitle}
         </div>

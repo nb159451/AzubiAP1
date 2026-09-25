@@ -44,7 +44,7 @@ function Header() {
         {!inExam && <Link to="/pruefungsordnung">Prüfungsordnung</Link>}
         {user ? (
           <>
-            {!inExam && <span className="muted">{user.name}</span>}
+            {!inExam && <span className="muted nav-user">{user.name}</span>}
             {!inExam && (
               <button
                 className="btn btn-ghost"

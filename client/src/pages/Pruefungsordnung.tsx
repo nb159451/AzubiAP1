@@ -51,7 +51,7 @@ export function PruefungsordnungPage() {
           und Punktzahl des Slots erfüllt. Aufgaben aus den letzten {bp.avoidRepeatsFromLastAttempts} Versuchen desselben Prüflings werden dabei gemieden,
           Antwortoptionen werden gemischt. So ist jede Prüfung anders, folgt aber immer derselben Struktur.
         </p>
-        <table className="tbl">
+        <div className="tbl-wrap"><table className="tbl">
           <thead>
             <tr>
               <th>Handlungsschritt</th>
@@ -82,7 +82,7 @@ export function PruefungsordnungPage() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
         <h3>§ 4 Bewertung</h3>
         <ul>
           <li>Multiple Choice (Einfachauswahl): volle Punktzahl nur bei richtiger Antwort.</li>
@@ -118,7 +118,7 @@ export function PruefungsordnungPage() {
         <p>
           Aktuell {info.catalogSize} Aufgaben im Katalog. KI-Anbieter: <strong>{info.aiProvider}</strong>.
         </p>
-        <table className="tbl">
+        <div className="tbl-wrap"><table className="tbl">
           <thead>
             <tr>
               <th>Handlungsschritt</th>
@@ -137,7 +137,7 @@ export function PruefungsordnungPage() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       </div>
     </div>
   );

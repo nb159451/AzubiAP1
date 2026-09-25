@@ -174,7 +174,8 @@ export function NetworkDiagram({ question, answer, onChange, readOnly, result }:
             : 'Ziehen Sie Geräte mit der Maus. Neue Geräte erscheinen unten und können mit × gelöscht werden. Ausgefüllte Adressfelder werden bewertet.'}
         </div>
       )}
-      <div className="net-canvas" ref={canvasRef} style={{ width, height, maxWidth: '100%' }} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
+      <div className="net-scroll">
+      <div className="net-canvas" ref={canvasRef} style={{ width, height }} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
         <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
           {a.links.map((l, i) => {
             const p = pos.get(l.a);
@@ -226,8 +227,10 @@ export function NetworkDiagram({ question, answer, onChange, readOnly, result }:
           </div>
         ))}
       </div>
+      </div>
       {readOnly && result?.details && (
-        <table className="tbl" style={{ marginTop: '0.6rem' }}>
+        <div className="tbl-wrap" style={{ marginTop: '0.6rem' }}>
+        <table className="tbl">
           <thead>
             <tr>
               <th>Anforderung</th>
@@ -249,6 +252,7 @@ export function NetworkDiagram({ question, answer, onChange, readOnly, result }:
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

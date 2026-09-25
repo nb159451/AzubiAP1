@@ -106,6 +106,7 @@ export function ResultPage() {
             {manual} Aufgabe(n) konnten nicht automatisch bewertet werden (keine KI konfiguriert). Sie können sich diese Aufgaben unten anhand der Musterlösung selbst bewerten.
           </div>
         )}
+        <div className="tbl-wrap">
         <table className="tbl">
           <thead>
             <tr>
@@ -134,6 +135,7 @@ export function ResultPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {attempt.exam.sections.map((s, si) => (

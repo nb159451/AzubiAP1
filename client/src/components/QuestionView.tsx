@@ -90,7 +90,8 @@ export function QuestionView({ index, question: q, answer, onChange, readOnly, r
             </div>
           )}
           {result.details && (q.type === 'calculation' || q.type === 'free_text') && result.details.length > 0 && (
-            <table className="tbl" style={{ marginTop: '0.6rem' }}>
+            <div className="tbl-wrap" style={{ marginTop: '0.6rem' }}>
+            <table className="tbl">
               <thead>
                 <tr>
                   <th>Kriterium</th>
@@ -112,6 +113,7 @@ export function QuestionView({ index, question: q, answer, onChange, readOnly, r
                 ))}
               </tbody>
             </table>
+            </div>
           )}
           {result.needsManualReview && onSelfGrade && (
             <div className="notice">
